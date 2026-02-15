@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Career Copilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-shape bg-shape-a"></div>
+  <div class="bg-shape bg-shape-b"></div>
+
+  <main class="shell">
+    <header class="hero">
+      <p class="eyebrow">2026 Job Market Toolkit</p>
+      <h1>AI Career Copilot</h1>
+      <p class="subtitle">Analyze ATS match, detect keyword gaps, and generate a sharper profile in seconds.</p>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Your Resume</h2>
+        <p class="hint">Paste your resume text or bullet points.</p>
+        <textarea id="resumeInput" placeholder="Example:\n- Built a customer dashboard with React and TypeScript\n- Improved API latency by 35%\n- Led integration with Stripe"></textarea>
+      </article>
+
+      <article class="card">
+        <h2>Job Description</h2>
+        <p class="hint">Paste vacancy text from LinkedIn or company site.</p>
+        <textarea id="jobInput" placeholder="Example:\nWe need a Full-Stack Engineer with Next.js, Node.js, PostgreSQL, AWS, CI/CD, and system design experience."></textarea>
+      </article>
+    </section>
+
+    <section class="actions">
+      <button id="analyzeBtn">Run Analysis</button>
+      <button id="fillDemoBtn" class="ghost">Load Demo Data</button>
+      <button id="clearBtn" class="ghost">Clear</button>
+    </section>
+
+    <section id="resultPanel" class="results hidden">
+      <article class="result-card score-card">
+        <h3>ATS Match Score</h3>
+        <div class="score-wrap">
+          <div class="score-ring">
+            <span id="scoreValue">0%</span>
+          </div>
+          <p id="scoreLabel">Add resume + job text to begin.</p>
+        </div>
+      </article>
+
+      <article class="result-card">
+        <h3>Missing Keywords</h3>
+        <div id="missingKeywords" class="chips"></div>
+      </article>
+
+      <article class="result-card">
+        <h3>Matched Keywords</h3>
+        <div id="matchedKeywords" class="chips"></div>
+      </article>
+
+      <article class="result-card full">
+        <h3>Tailored Professional Summary</h3>
+        <p id="generatedSummary" class="summary"></p>
+      </article>
+
+      <article class="result-card full">
+        <h3>Action Plan (Top 5)</h3>
+        <ol id="actionPlan" class="plan"></ol>
+      </article>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
