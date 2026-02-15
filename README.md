@@ -8,6 +8,7 @@ AI-powered web app to tailor your resume for a specific job description.
 - matched vs missing keywords
 - AI-generated professional summary
 - top-5 action plan for resume optimization
+- tailored resume draft for the selected vacancy
 - graceful fallback to local analysis if API is unavailable
 
 ## Tech Stack

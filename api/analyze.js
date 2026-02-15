@@ -27,7 +27,8 @@ function normalizePayload(parsed) {
     matchedKeywords: Array.isArray(parsed.matchedKeywords) ? parsed.matchedKeywords.slice(0, 24) : [],
     missingKeywords: Array.isArray(parsed.missingKeywords) ? parsed.missingKeywords.slice(0, 24) : [],
     summary: typeof parsed.summary === "string" ? parsed.summary : "",
-    actionPlan: Array.isArray(parsed.actionPlan) ? parsed.actionPlan.slice(0, 5) : []
+    actionPlan: Array.isArray(parsed.actionPlan) ? parsed.actionPlan.slice(0, 5) : [],
+    tailoredResume: typeof parsed.tailoredResume === "string" ? parsed.tailoredResume : ""
   };
 }
 
@@ -105,7 +106,7 @@ export default async function handler(req, res) {
 
   try {
     const targetLanguage = language === "ru" ? "Russian" : "English";
-    const prompt = `Analyze resume text against job description. Return strict JSON only with fields: score(number 0-100), matchedKeywords(array of strings), missingKeywords(array of strings), summary(string), actionPlan(array of 5 strings). Write summary and actionPlan in ${targetLanguage}.
+    const prompt = `Analyze resume text against job description. Return strict JSON only with fields: score(number 0-100), matchedKeywords(array of strings), missingKeywords(array of strings), summary(string), actionPlan(array of 5 strings), tailoredResume(string). Write summary, actionPlan, and tailoredResume in ${targetLanguage}. In tailoredResume, return a concise resume draft with sections and bullets tailored to the vacancy.
 
 Resume:\n${resumeText}\n\nJob Description:\n${jobText}`;
     const provider = (process.env.AI_PROVIDER || "").toLowerCase();

@@ -181,6 +181,12 @@ button:hover {
   box-shadow: 0 8px 24px rgba(12, 127, 109, 0.3);
 }
 
+#generateResumeBtn {
+  background: linear-gradient(90deg, #d85d1e, var(--accent-2));
+  color: white;
+  box-shadow: 0 8px 24px rgba(247, 119, 55, 0.28);
+}
+
 .ghost {
   background: rgba(255, 255, 255, 0.88);
   border: 1px solid var(--line);
@@ -275,6 +281,18 @@ button:hover {
   padding-left: 18px;
   color: #232634;
   line-height: 1.6;
+}
+
+.resume-output {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1f2230;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font: 500 0.9rem/1.55 "IBM Plex Mono", ui-monospace, monospace;
 }
 
 @keyframes rise {

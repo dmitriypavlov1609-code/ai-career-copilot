@@ -14,7 +14,9 @@ const i18n = {
     jobHint: "Paste vacancy text from LinkedIn or company site.",
     jobPlaceholder: "Example:\nWe need a Full-Stack Engineer with Next.js, Node.js, PostgreSQL, AWS, CI/CD, and system design experience.",
     analyzeBtn: "Run Analysis",
+    generateResumeBtn: "Generate Tailored Resume",
     analyzing: "Analyzing...",
+    generatingResume: "Generating resume...",
     fillDemoBtn: "Load Demo Data",
     clearBtn: "Clear",
     scoreTitle: "ATS Match Score",
@@ -23,9 +25,11 @@ const i18n = {
     matchedTitle: "Matched Keywords",
     summaryTitle: "Tailored Professional Summary",
     planTitle: "Action Plan (Top 5)",
+    resumeOutputTitle: "Tailored Resume Draft",
     alertMissingInput: "Please paste both resume text and job description.",
     noGaps: "no critical gaps found",
     noneYet: "none yet",
+    resumeDraftFallback: "Professional Summary\n- Tailored resume draft is generated from your input.\n\nCore Skills\n- Add role-relevant skills from the job description.\n\nExperience Highlights\n- Rewrite bullets with measurable impact and role keywords.",
     scoreLabelHigh: "High match. Optimize wording and metrics.",
     scoreLabelGood: "Good match. Close a few keyword gaps.",
     scoreLabelMid: "Medium match. Needs targeted tailoring.",
@@ -59,7 +63,9 @@ const i18n = {
     jobHint: "Вставьте текст вакансии с LinkedIn или сайта компании.",
     jobPlaceholder: "Пример:\nИщем Full-Stack инженера с опытом Next.js, Node.js, PostgreSQL, AWS, CI/CD и system design.",
     analyzeBtn: "Запустить анализ",
+    generateResumeBtn: "Сформировать резюме",
     analyzing: "Анализируем...",
+    generatingResume: "Генерируем резюме...",
     fillDemoBtn: "Загрузить демо",
     clearBtn: "Очистить",
     scoreTitle: "Оценка ATS",
@@ -68,9 +74,11 @@ const i18n = {
     matchedTitle: "Совпавшие ключевые слова",
     summaryTitle: "Адаптированное проф. резюме",
     planTitle: "План действий (Топ 5)",
+    resumeOutputTitle: "Черновик резюме под вакансию",
     alertMissingInput: "Пожалуйста, вставьте и резюме, и описание вакансии.",
     noGaps: "критичных пробелов не найдено",
     noneYet: "пока нет",
+    resumeDraftFallback: "Профессиональное резюме\n- Черновик сформирован на основе ваших данных.\n\nКлючевые навыки\n- Добавьте навыки из требований вакансии.\n\nОпыт и достижения\n- Перепишите пункты с измеримым результатом и ключевыми словами роли.",
     scoreLabelHigh: "Высокое совпадение. Улучшите формулировки и метрики.",
     scoreLabelGood: "Хорошее совпадение. Закройте несколько пробелов.",
     scoreLabelMid: "Среднее совпадение. Нужна точечная адаптация.",
@@ -105,6 +113,7 @@ const languageLabel = document.querySelector(".lang-picker span");
 const resumeInput = document.getElementById("resumeInput");
 const jobInput = document.getElementById("jobInput");
 const analyzeBtn = document.getElementById("analyzeBtn");
+const generateResumeBtn = document.getElementById("generateResumeBtn");
 const fillDemoBtn = document.getElementById("fillDemoBtn");
 const clearBtn = document.getElementById("clearBtn");
 const resultPanel = document.getElementById("resultPanel");
@@ -116,6 +125,7 @@ const missingKeywords = document.getElementById("missingKeywords");
 const matchedKeywords = document.getElementById("matchedKeywords");
 const generatedSummary = document.getElementById("generatedSummary");
 const actionPlan = document.getElementById("actionPlan");
+const generatedResume = document.getElementById("generatedResume");
 
 function t() {
   return i18n[currentLanguage];
@@ -140,15 +150,18 @@ function setUiLanguage(language) {
   document.getElementById("matchedTitle").textContent = tr.matchedTitle;
   document.getElementById("summaryTitle").textContent = tr.summaryTitle;
   document.getElementById("planTitle").textContent = tr.planTitle;
+  document.getElementById("resumeOutputTitle").textContent = tr.resumeOutputTitle;
 
   resumeInput.placeholder = tr.resumePlaceholder;
   jobInput.placeholder = tr.jobPlaceholder;
   analyzeBtn.textContent = tr.analyzeBtn;
+  generateResumeBtn.textContent = tr.generateResumeBtn;
   fillDemoBtn.textContent = tr.fillDemoBtn;
   clearBtn.textContent = tr.clearBtn;
 
   if (resultPanel.classList.contains("hidden")) {
     scoreLabel.textContent = tr.scoreInitial;
+    generatedResume.textContent = tr.resumeDraftFallback;
   }
 }
 
@@ -210,6 +223,49 @@ function buildActions(missing, score) {
   return list.slice(0, 5);
 }
 
+function buildTailoredResume(resumeText, jobText, missing) {
+  const tr = t();
+  const resumeLines = resumeText.split("\n").map((line) => line.trim()).filter(Boolean);
+  const headline = resumeLines[0] || "";
+  const bullets = resumeLines.filter((line) => line.startsWith("-")).slice(0, 5);
+  const missingSkills = missing.slice(0, 5).join(", ");
+  const jobHint = jobText.split("\n")[0]?.trim() || "";
+
+  if (currentLanguage === "ru") {
+    return [
+      headline ? `Заголовок\n${headline}` : "Заголовок\nSenior Software Engineer",
+      "",
+      `Целевая роль\n${jobHint || "Роль из выбранной вакансии"}`,
+      "",
+      "Ключевые навыки",
+      missingSkills ? `- Добавить в резюме: ${missingSkills}` : "- Добавить навыки из вакансии",
+      "- Подчеркнуть стек и инструменты, указанные в требованиях",
+      "",
+      "Достижения",
+      ...(bullets.length ? bullets : ["- Укажите 3-5 результатов с цифрами: скорость, выручка, экономия"]),
+      "",
+      "Краткое summary",
+      "- Инженер, который закрывает задачи end-to-end, улучшает метрики и работает с приоритетами бизнеса."
+    ].join("\n");
+  }
+
+  return [
+    headline ? `Headline\n${headline}` : "Headline\nSenior Software Engineer",
+    "",
+    `Target Role\n${jobHint || "Role from selected job description"}`,
+    "",
+    "Core Skills",
+    missingSkills ? `- Add to resume: ${missingSkills}` : "- Add role requirements from job description",
+    "- Mirror stack and tooling named in the vacancy",
+    "",
+    "Achievement Bullets",
+    ...(bullets.length ? bullets : ["- Add 3-5 quantified outcomes: speed, revenue, cost savings"]),
+    "",
+    "Professional Summary",
+    "- End-to-end engineer focused on measurable outcomes and business priorities."
+  ].join("\n");
+}
+
 function setScore(score) {
   const tr = t();
   scoreValue.textContent = `${score}%`;
@@ -226,7 +282,7 @@ function setScore(score) {
   }
 }
 
-function renderAnalysis(result) {
+function renderAnalysis(result, context = {}) {
   const tr = t();
   const score = clamp(Math.round(result.score || 0), 0, 100);
   const missing = Array.isArray(result.missingKeywords) ? result.missingKeywords : [];
@@ -246,6 +302,7 @@ function renderAnalysis(result) {
   });
 
   generatedSummary.textContent = result.summary || buildSummary(score, matched, missing);
+  generatedResume.textContent = result.tailoredResume || buildTailoredResume(context.resumeText || "", context.jobText || "", missing);
 
   actionPlan.innerHTML = "";
   const plan = Array.isArray(result.actionPlan) && result.actionPlan.length
@@ -284,7 +341,8 @@ function localAnalyze(resumeText, jobText) {
     matchedKeywords: matched,
     missingKeywords: missing,
     summary: buildSummary(score, matched, missing),
-    actionPlan: buildActions(missing, score)
+    actionPlan: buildActions(missing, score),
+    tailoredResume: buildTailoredResume(resumeText, jobText, missing)
   };
 }
 
@@ -316,13 +374,51 @@ async function analyze() {
     }
 
     const data = await response.json();
-    renderAnalysis(data);
+    renderAnalysis(data, { resumeText, jobText });
   } catch {
     const fallback = localAnalyze(resumeText, jobText);
-    renderAnalysis(fallback);
+    renderAnalysis(fallback, { resumeText, jobText });
   } finally {
     analyzeBtn.disabled = false;
     analyzeBtn.textContent = initialText;
+  }
+}
+
+async function generateResumeDraft() {
+  const tr = t();
+  const resumeText = resumeInput.value.trim();
+  const jobText = jobInput.value.trim();
+
+  if (!resumeText || !jobText) {
+    alert(tr.alertMissingInput);
+    return;
+  }
+
+  const initialText = tr.generateResumeBtn;
+  generateResumeBtn.disabled = true;
+  generateResumeBtn.textContent = tr.generatingResume;
+
+  try {
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ resumeText, jobText, language: currentLanguage })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    renderAnalysis(data, { resumeText, jobText });
+  } catch {
+    const fallback = localAnalyze(resumeText, jobText);
+    renderAnalysis(fallback, { resumeText, jobText });
+  } finally {
+    generateResumeBtn.disabled = false;
+    generateResumeBtn.textContent = initialText;
   }
 }
 
@@ -337,6 +433,7 @@ function clearAll() {
   jobInput.value = "";
   resultPanel.classList.add("hidden");
   scoreLabel.textContent = t().scoreInitial;
+  generatedResume.textContent = t().resumeDraftFallback;
 }
 
 languageSelect.addEventListener("change", (event) => {
@@ -344,6 +441,7 @@ languageSelect.addEventListener("change", (event) => {
 });
 
 analyzeBtn.addEventListener("click", analyze);
+generateResumeBtn.addEventListener("click", generateResumeDraft);
 fillDemoBtn.addEventListener("click", fillDemo);
 clearBtn.addEventListener("click", clearAll);
 
