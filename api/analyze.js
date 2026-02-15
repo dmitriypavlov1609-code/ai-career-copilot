@@ -97,14 +97,15 @@ export default async function handler(req, res) {
     return;
   }
 
-  const { resumeText, jobText } = req.body || {};
+  const { resumeText, jobText, language } = req.body || {};
   if (!resumeText || !jobText) {
     res.status(400).json({ error: "resumeText and jobText are required" });
     return;
   }
 
   try {
-    const prompt = `Analyze resume text against job description. Return strict JSON only with fields: score(number 0-100), matchedKeywords(array of strings), missingKeywords(array of strings), summary(string), actionPlan(array of 5 strings).
+    const targetLanguage = language === "ru" ? "Russian" : "English";
+    const prompt = `Analyze resume text against job description. Return strict JSON only with fields: score(number 0-100), matchedKeywords(array of strings), missingKeywords(array of strings), summary(string), actionPlan(array of 5 strings). Write summary and actionPlan in ${targetLanguage}.
 
 Resume:\n${resumeText}\n\nJob Description:\n${jobText}`;
     const provider = (process.env.AI_PROVIDER || "").toLowerCase();

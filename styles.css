@@ -60,6 +60,13 @@ body {
   animation: rise 420ms ease-out both;
 }
 
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .eyebrow {
   margin: 0 0 10px;
   text-transform: uppercase;
@@ -79,6 +86,22 @@ h1 {
   margin: 12px 0 0;
   color: var(--muted);
   max-width: 750px;
+}
+
+.lang-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.lang-picker select {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font: 600 0.82rem "IBM Plex Mono", ui-monospace, monospace;
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .grid {
@@ -275,6 +298,11 @@ button:hover {
 }
 
 @media (max-width: 900px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .grid,
   .results {
     grid-template-columns: 1fr;
