@@ -1,7 +1,5 @@
 import OpenAI from "openai";
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 function parseJsonResponse(text) {
   try {
     return JSON.parse(text);
@@ -28,6 +26,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const prompt = `Analyze resume text against job description. Return strict JSON only with fields: score(number 0-100), matchedKeywords(array of strings), missingKeywords(array of strings), summary(string), actionPlan(array of 5 strings).
 
 Resume:\n${resumeText}\n\nJob Description:\n${jobText}`;
