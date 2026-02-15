@@ -92,15 +92,41 @@ function setScore(score) {
   }
 }
 
-function analyze() {
-  const resumeText = resumeInput.value.trim();
-  const jobText = jobInput.value.trim();
+function renderAnalysis(result) {
+  const score = clamp(Math.round(result.score || 0), 0, 100);
+  const missing = Array.isArray(result.missingKeywords) ? result.missingKeywords : [];
+  const matched = Array.isArray(result.matchedKeywords) ? result.matchedKeywords : [];
 
-  if (!resumeText || !jobText) {
-    alert("Please paste both resume text and job description.");
-    return;
+  setScore(score);
+
+  missingKeywords.innerHTML = "";
+  matchedKeywords.innerHTML = "";
+
+  (missing.length ? missing : ["no critical gaps found"]).forEach((word) => {
+    missingKeywords.appendChild(chip(word, "miss"));
+  });
+
+  (matched.length ? matched : ["none yet"]).forEach((word) => {
+    matchedKeywords.appendChild(chip(word, "match"));
+  });
+
+  generatedSummary.textContent = result.summary || buildSummary(score, matched, missing);
+
+  actionPlan.innerHTML = "";
+  const plan = Array.isArray(result.actionPlan) && result.actionPlan.length
+    ? result.actionPlan
+    : buildActions(missing, score);
+
+  for (const action of plan.slice(0, 5)) {
+    const li = document.createElement("li");
+    li.textContent = action;
+    actionPlan.appendChild(li);
   }
 
+  resultPanel.classList.remove("hidden");
+}
+
+function localAnalyze(resumeText, jobText) {
   const resumeSet = new Set(tokenize(resumeText));
   const jobKeywords = topKeywords(jobText, 24);
 
@@ -118,29 +144,50 @@ function analyze() {
   const rawScore = jobKeywords.length ? (matched.length / jobKeywords.length) * 100 : 0;
   const score = clamp(Math.round(rawScore), 8, 98);
 
-  setScore(score);
+  return {
+    score,
+    matchedKeywords: matched,
+    missingKeywords: missing,
+    summary: buildSummary(score, matched, missing),
+    actionPlan: buildActions(missing, score)
+  };
+}
 
-  missingKeywords.innerHTML = "";
-  matchedKeywords.innerHTML = "";
+async function analyze() {
+  const resumeText = resumeInput.value.trim();
+  const jobText = jobInput.value.trim();
 
-  (missing.length ? missing : ["no critical gaps found"]).forEach((word) => {
-    missingKeywords.appendChild(chip(word, "miss"));
-  });
-
-  (matched.length ? matched : ["none yet"]).forEach((word) => {
-    matchedKeywords.appendChild(chip(word, "match"));
-  });
-
-  generatedSummary.textContent = buildSummary(score, matched, missing);
-
-  actionPlan.innerHTML = "";
-  for (const action of buildActions(missing, score)) {
-    const li = document.createElement("li");
-    li.textContent = action;
-    actionPlan.appendChild(li);
+  if (!resumeText || !jobText) {
+    alert("Please paste both resume text and job description.");
+    return;
   }
 
-  resultPanel.classList.remove("hidden");
+  const initialText = analyzeBtn.textContent;
+  analyzeBtn.disabled = true;
+  analyzeBtn.textContent = "Analyzing...";
+
+  try {
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ resumeText, jobText })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    renderAnalysis(data);
+  } catch {
+    const fallback = localAnalyze(resumeText, jobText);
+    renderAnalysis(fallback);
+  } finally {
+    analyzeBtn.disabled = false;
+    analyzeBtn.textContent = initialText;
+  }
 }
 
 function fillDemo() {

@@ -1,33 +1,83 @@
 # AI Career Copilot
 
-A practical single-page web app to tailor your resume for a specific job description.
+AI-powered web app to tailor your resume for a specific job description.
 
-## Why this app
+## Features
 
-In the current market, ATS alignment and fast resume customization are critical. This tool gives you:
 - ATS match score
 - matched vs missing keywords
-- generated professional summary
-- top-5 action plan to improve your application
+- AI-generated professional summary
+- top-5 action plan for resume optimization
+- graceful fallback to local analysis if API is unavailable
 
-## Run locally
+## Tech Stack
 
-No dependencies required.
+- Frontend: HTML, CSS, Vanilla JavaScript
+- Backend: Vercel Serverless Function (`api/analyze.js`)
+- LLM: OpenAI Responses API
+
+## Local Development (with AI backend)
 
 ```bash
 cd ai-career-copilot
-python3 -m http.server 8080
+npm install
+cp .env.example .env.local
 ```
 
-Then open: `http://localhost:8080`
+Set your key in `.env.local`:
 
-## Stack
+```bash
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-4.1-mini
+```
 
-- HTML
-- CSS
-- Vanilla JavaScript
+Run:
 
-## Notes
+```bash
+npm run dev
+```
 
-- All analysis runs locally in the browser.
-- No external API key is required.
+Open: `http://localhost:3000`
+
+## Deploy to Vercel
+
+```bash
+npm i -g vercel
+vercel login
+vercel
+```
+
+Set production env vars in Vercel Project Settings:
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL` (optional, default is `gpt-4.1-mini`)
+
+Deploy production:
+
+```bash
+vercel --prod
+```
+
+## API Contract
+
+`POST /api/analyze`
+
+Body:
+
+```json
+{
+  "resumeText": "...",
+  "jobText": "..."
+}
+```
+
+Response:
+
+```json
+{
+  "score": 78,
+  "matchedKeywords": ["typescript", "node.js"],
+  "missingKeywords": ["kubernetes", "graphql"],
+  "summary": "...",
+  "actionPlan": ["...", "...", "...", "...", "..."]
+}
+```
