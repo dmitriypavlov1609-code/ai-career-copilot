@@ -14,7 +14,7 @@ AI-powered web app to tailor your resume for a specific job description.
 
 - Frontend: HTML, CSS, Vanilla JavaScript
 - Backend: Vercel Serverless Function (`api/analyze.js`)
-- LLM: OpenAI Responses API
+- LLM: Groq API (default) or OpenAI API
 
 ## Local Development (with AI backend)
 
@@ -24,9 +24,12 @@ npm install
 cp .env.example .env.local
 ```
 
-Set your key in `.env.local`:
+Set env vars in `.env.local`:
 
 ```bash
+AI_PROVIDER=groq
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
 OPENAI_API_KEY=your_openai_api_key_here
 OPENAI_MODEL=gpt-4.1-mini
 ```
@@ -48,8 +51,9 @@ vercel
 ```
 
 Set production env vars in Vercel Project Settings:
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL` (optional, default is `gpt-4.1-mini`)
+- `AI_PROVIDER` (`groq` or `openai`)
+- `GROQ_API_KEY` and `GROQ_MODEL` (for Groq)
+- `OPENAI_API_KEY` and `OPENAI_MODEL` (for OpenAI)
 
 Deploy production:
 
